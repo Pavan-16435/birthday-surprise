@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Birthday Surprise</title>
+
+<style>
+
+body{
+    margin:0;
+    font-family: Arial, sans-serif;
+    text-align:center;
+    height:100vh;
+    width:100vw;
+    background-image:url("https://d23.com/app/uploads/2006/06/1180w-600h_TDID-cars.jpg");
+    background-size: cover;
+    background-repeat:no-repeat;
+    background-position:center;
+    background-attachment: fixed;
+    display:flex;
+    flex-direction: column;
+    justify-content:center;
+    align-items:center;
+}
+
+/* Form Container */
+.form-container {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    z-index: 2;
+    animation: slideIn 0.6s ease-out;
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(-30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.form-container h1 {
+    font-size: 42px;
+    color: white;
+    text-shadow: 3px 3px 8px black;
+    margin-bottom: 30px;
+}
+
+.form-group { margin: 20px 0; }
+
+.form-group label {
+    display: block;
+    font-size: 18px;
+    color: white;
+    text-shadow: 2px 2px 4px black;
+    margin-bottom: 8px;
+    text-align: left;
+}
+
+.form-group input {
+    width: 300px;
+    padding: 12px;
+    font-size: 16px;
+    border: 2px solid #0066cc;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.95);
+    color: #333;
+}
+
+.submit-btn {
+    margin-top: 30px;
+    padding: 12px 40px;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    background: linear-gradient(135deg, #0066cc, #0099ff);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* Success Message */
+.success-message {
+    display: none;
+    font-size: 24px;
+    color: white;
+    text-shadow: 2px 2px 4px black;
+}
+
+/* Stop Button */
+.stop-btn {
+    display: none;
+    margin-top: 20px;
+    padding: 12px 40px;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    background: linear-gradient(135deg, #cc0000, #ff0000);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    z-index: 100;
+}
+
+/* Modal */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-overlay.show { display:flex; }
+
+.modal-box {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+}
+
+/* Container */
+#surpriseImageContainer {
+    display: none;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+/* Common image style */
+#surpriseImageContainer img {
+    width: 250px;
+    height: 400px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+    opacity: 0;
+}
+
+/* LEFT animation */
+.left {
+    transform: translateX(-200px);
+}
+
+/* RIGHT animation */
+.right {
+    transform: translateX(200px);
+}
+
+/* CENTER animation */
+.center {
+    transform: scale(0.5);
+}
+
+/* Keyframes */
+@keyframes slideLeft {
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideRight {
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes popCenter {
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Shake animation */
+@keyframes shake {
+    0% { transform: translateX(0); }
+    20% { transform: translateX(-10px); }
+    40% { transform: translateX(10px); }
+    60% { transform: translateX(-10px); }
+    80% { transform: translateX(10px); }
+    100% { transform: translateX(0); }
+}
+
+/* Class to trigger shake */
+.shake {
+    animation: shake 0.5s;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal">
+    <div class="modal-box">
+        <h2>⚠️ Oops!</h2>
+        <p>My goal is to become a teacher🤣😁.</p>
+        <button onclick="closeModal()">Try Again</button>
+    </div>
+</div>
+
+<!-- Form -->
+<div class="form-container" id="formContainer">
+  
+    <form id="birthdayForm">
+        <div class="form-group">
+            <label>Your Name:</label>
+            <input type="text" id="name" required>
+        </div>
+        
+        <div class="form-group">
+            <label>Nick Name:(given by your friend)</label>
+            <input type="text" id="nickname" placeholder="ex. as decent actor" required>
+        </div>
+        
+        <button type="submit" class="submit-btn">Click here to know 195 countries boys ......... friend 😂😉😂😁</button>
+    </form>
+</div>
+
+<!-- Audio -->
+<audio id="teddySong" style="display: none;">
+    <source src="teddy.mp3.mp3" type="audio/mpeg">
+</audio>
+
+<audio id="teacherSong" style="display: none;">
+    <source src="teacher.mp3" type="audio/mpeg">
+</audio>
+
+<audio id="rabbitSong" style="display: none;">
+    <source src="rabbit.mp3" type="audio/mpeg">
+</audio>
+
+<audio id="finalSong" style="display:none;">
+    <source src="final.mp3" type="audio/mpeg">
+</audio>
+
+<!-- Success -->
+<div class="success-message" id="successMessage">
+    🎶 Playing your birthday song! 🎶
+    <button class="stop-btn" id="stopTeddyBtn" onclick="stopTeddyAudio()">Stop Teddy 🛑</button>
+</div>
+
+<!-- Surprise Image -->
+<div id="surpriseImageContainer">
+    <img src="first-image.png" class="left">
+    <img src="third-image.png" class="right">
+    <img src="fifth-image.png" class="left">
+    <img src="second-image.png" class="right">
+    <img src="fourth-image.png" class="center">
+</div>
+
+<button id="goBackBtn" style="display:none; margin-top:20px; padding:12px 30px; font-size:16px; border:none; border-radius:10px; background:#0099ff; color:white; cursor:pointer;">
+    🔁 Go back and enter another nickname for one more surprise
+</button>
+
+<div id="finalScreen" style="
+    display:none;
+    flex-direction:column;
+    align-items:center;
+    margin-top:20px;
+">
+
+    <img src="end-image.png"
+         style="width:400px; border-radius:20px; box-shadow:0 10px 30px rgba(0,0,0,0.7);">
+
+    <h1 style="
+        color:white;
+        text-shadow:2px 2px 8px black;
+        margin-top:20px;
+    ">
+        🎉 Happy Birthday Rohitha from your Stranger😁🤞(No Common Sense) 🎂
+    </h1>
+
+</div>
+
+
+<script>
+
+let currentMode = "";       
+const teddyImages = [
+    "first-image.png",
+    "fourth-image.png",
+    "third-image.png",
+    "second-image.png",
+    "fifth-image.png"
+];
+
+const rabbitImages = [
+    "group-5.png",  // LEFT
+    "group-3.png",  // RIGHT
+    "group-4.png",  // LEFT
+    "group-1.png",  // RIGHT
+    "group-2.png"   // CENTER (last)
+];
+const finalAudio = document.getElementById('finalSong');
+const form = document.getElementById('birthdayForm');
+const modal = document.getElementById('modal');
+const formContainer = document.getElementById('formContainer');
+const successMessage = document.getElementById('successMessage');
+const surpriseImage = document.getElementById('surpriseImageContainer');
+const teddyAudio = document.getElementById('teddySong');
+const teacherAudio = document.getElementById('teacherSong');
+const rabbitAudio = document.getElementById('rabbitSong');
+const stopTeddyBtn = document.getElementById('stopTeddyBtn');
+const goBackBtn = document.getElementById("goBackBtn");
+goBackBtn.addEventListener("click", function(){
+
+    if(currentMode === "rabbit"){
+        showFinalScreen();   // 🎉 birthday ending
+    } else {
+        goBackToForm();      // 🔁 normal behavior (teddy)
+    }
+
+});
+
+let isTeddyPlaying = false;
+let teddyLoopListener = null;
+
+const TEDDY_START = 8.5;
+const TEDDY_END = 32;
+
+// Listen for teddy audio time updates to handle looping
+function setupTeddyAudioLoop(){
+    if(teddyLoopListener) {
+        teddyAudio.removeEventListener('timeupdate', teddyLoopListener);
+    }
+    
+    teddyLoopListener = function() {
+        if(isTeddyPlaying && teddyAudio.currentTime >= TEDDY_END) {
+            teddyAudio.currentTime = TEDDY_START;
+            teddyAudio.play().catch(err => console.log('Loop play error:', err));
+        }
+    };
+    
+    teddyAudio.addEventListener('timeupdate', teddyLoopListener);
+}
+
+function showModal(){ modal.classList.add('show'); }
+function closeModal(){ modal.classList.remove('show'); }
+
+function showImagesSequence(imageSet) {
+
+    const imgs = document.querySelectorAll('#surpriseImageContainer img');
+
+    imgs.forEach((img, index) => {
+
+        // 🔥 change image dynamically
+        img.src = imageSet[index];
+
+        setTimeout(() => {
+
+            img.style.opacity = "1";
+
+            img.style.animation = "none";
+            img.offsetHeight;
+
+            if (img.classList.contains('left')) {
+                img.style.animation = "slideLeft 0.8s ease forwards";
+            } 
+            else if (img.classList.contains('right')) {
+                img.style.animation = "slideRight 0.8s ease forwards";
+            } 
+            else {
+                img.style.animation = "popCenter 0.8s ease forwards";
+            }
+
+        }, index * 1500);
+
+    });
+}
+
+form.addEventListener('submit', function(e){
+    e.preventDefault();
+
+    let name = document.getElementById('name').value.toLowerCase();
+    let nickname = document.getElementById('nickname').value.toLowerCase();
+
+    if(name !== 'rohitha'){
+    formContainer.classList.add("shake");
+    
+    setTimeout(() => {
+        formContainer.classList.remove("shake");
+    }, 4000);
+
+    showModal();
+    return;
+}
+
+   if(!['rabbit','teddy','teacher'].includes(nickname)){
+    formContainer.classList.add("shake");
+    
+    setTimeout(() => {
+        formContainer.classList.remove("shake");
+    }, 4000);
+
+    showModal();
+    return;
+}
+
+    formContainer.style.display = 'none';
+    successMessage.style.display = 'none';
+    surpriseImage.style.display = 'flex';
+
+    teddyAudio.pause();
+    teacherAudio.pause();
+    rabbitAudio.pause();
+    
+    teddyAudio.style.display = 'none';
+    teacherAudio.style.display = 'none';
+    rabbitAudio.style.display = 'none';
+
+    if(nickname === 'teddy'){
+        currentMode = "teddy";
+        isTeddyPlaying = true;
+        stopTeddyBtn.style.display = 'block';
+        teddyAudio.style.display = 'block';
+        
+        // Play with error handling
+            teddyAudio.currentTime = TEDDY_START;
+
+        teddyAudio.play().then(() => {
+            syncImagesWithAudio(teddyAudio); // 🎬 only this
+        }).catch(err => {
+            console.error('Teddy audio play error:', err);
+        });
+        setupTeddyAudioLoop();
+    }
+    else if(nickname === 'teacher'){
+        teacherAudio.style.display = 'block';
+        teacherAudio.currentTime = 0;
+        teacherAudio.play().catch(err => {
+            console.error('Teacher audio play error:', err);
+            alert('Audio failed to play: ' + err.message);
+        });
+    }
+   else{
+    currentMode = "rabbit";
+    rabbitAudio.style.display = 'block';
+    rabbitAudio.currentTime = 8.0;
+
+    // ✅ SET IMAGES FIRST
+    const imgs = document.querySelectorAll('#surpriseImageContainer img');
+    imgs.forEach((img, index) => {
+        img.src = rabbitImages[index];
+        img.style.opacity = "0";
+        img.style.animation = "none";
+    });
+
+    // ✅ PLAY + SYNC (MOST IMPORTANT)
+    rabbitAudio.play().then(() => {
+        syncRabbitImages(rabbitAudio);
+    }).catch(err => {
+        console.error('Rabbit audio play error:', err);
+    });
+}
+
+});
+
+const beatTimings = [9, 12, 15, 18, 21];
+
+function syncImagesWithAudio(audio) {
+
+    const imgs = document.querySelectorAll('#surpriseImageContainer img');
+    const order = [imgs[0], imgs[4], imgs[1], imgs[3], imgs[2]];
+
+    let shown = new Array(order.length).fill(false);
+
+    audio.ontimeupdate = function () {
+        let current = audio.currentTime;
+
+        if (current >= 28) {
+            goBackBtn.style.display = "block";
+        }
+
+        order.forEach((img, index) => {
+            if (!shown[index] && current >= beatTimings[index]) {
+
+                shown[index] = true;
+
+                img.style.opacity = "1";
+
+                img.style.animation = "none";
+                img.offsetHeight;
+
+                if (img.classList.contains('left')) {
+                    img.style.animation = "slideLeft 0.8s ease forwards";
+                } 
+                else if (img.classList.contains('right')) {
+                    img.style.animation = "slideRight 0.8s ease forwards";
+                } 
+                else {
+                    img.style.animation = "popCenter 0.8s ease forwards";
+                }
+            }
+        });
+    };
+}
+
+function goBackToForm(){
+
+    // stop all audio
+    teddyAudio.pause();
+    teacherAudio.pause();
+    rabbitAudio.pause();
+
+    // reset audio
+    teddyAudio.currentTime = 0;
+    teacherAudio.currentTime = 0;
+    rabbitAudio.currentTime = 0;
+
+    // remove sync listener
+    teddyAudio.ontimeupdate = null;
+
+    // hide images
+    surpriseImage.style.display = "none";
+
+    // reset images
+    const imgs = document.querySelectorAll('#surpriseImageContainer img');
+    imgs.forEach(img => {
+        img.style.opacity = "0";
+        img.style.animation = "none";
+    });
+
+    // hide button
+    goBackBtn.style.display = "none";
+
+    // show form again
+    formContainer.style.display = "block";
+}
+function stopTeddyAudio(){
+    isTeddyPlaying = false;
+    teddyAudio.pause();
+    teddyAudio.style.display = 'none';
+    stopTeddyBtn.style.display = 'none';
+    
+    if(teddyLoopListener) {
+        teddyAudio.removeEventListener('timeupdate', teddyLoopListener);
+    }
+    
+    formContainer.style.display = 'block';
+    successMessage.style.display = 'none';
+}
+function syncRabbitImages(audio) {
+
+    const imgs = document.querySelectorAll('#surpriseImageContainer img');
+
+    // SAME STRUCTURE AS TEDDY (important)
+    const order = [imgs[0], imgs[1], imgs[2], imgs[3], imgs[4]];
+
+    const rabbitBeatTimings = [11, 16, 21, 26, 31];
+
+    let shown = new Array(order.length).fill(false);
+
+    audio.ontimeupdate = function () {
+
+        let current = audio.currentTime;
+
+        // stop at 36 sec
+        if (current >= 36) {
+            audio.pause();
+            goBackBtn.style.display = "block";
+            audio.ontimeupdate = null;
+            return;
+        }
+
+        order.forEach((img, index) => {
+
+            if (!shown[index] && current >= rabbitBeatTimings[index]) {
+
+                shown[index] = true;
+
+                img.style.opacity = "1";
+
+                // 🔥 MUST (same as teddy)
+                img.style.animation = "none";
+                img.offsetHeight;
+
+                if (img.classList.contains('left')) {
+                    img.style.animation = "slideLeft 0.8s ease forwards";
+                } 
+                else if (img.classList.contains('right')) {
+                    img.style.animation = "slideRight 0.8s ease forwards";
+                } 
+                else {
+                    img.style.animation = "popCenter 0.8s ease forwards";
+                }
+            }
+        });
+    };
+}
+
+function showFinalScreen(){
+
+    // ❌ stop all other audio
+    teddyAudio.pause();
+    teacherAudio.pause();
+    rabbitAudio.pause();
+
+    // ✅ reset final audio (important if replay)
+    finalAudio.currentTime = 0;
+
+    // ❌ hide current UI
+    surpriseImage.style.display = "none";
+    successMessage.style.display = "none";
+    goBackBtn.style.display = "none";
+
+    // ✅ show final screen
+    const final = document.getElementById("finalScreen");
+    final.style.display = "flex";
+
+    // ✨ fade effect
+    final.style.opacity = "0";
+    setTimeout(()=>{
+        final.style.transition = "opacity 1s";
+        final.style.opacity = "1";
+    },100);
+
+    // 🎶 PLAY FINAL SONG
+    finalAudio.play().catch(err => {
+        console.error("Final audio error:", err);
+    });
+}
+
+</script>
+
+</body>
+</html>

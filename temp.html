@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Birthday Surprise</title>
+
+<style>
+body{
+    margin:0;
+    font-family: Arial, sans-serif;
+    text-align:center;
+    height:100vh;
+    width:100vw;
+    background-image:url("https://d23.com/app/uploads/2006/06/1180w-600h_TDID-cars.jpg");
+    background-size: cover;
+    background-position:center;
+    display:flex;
+    flex-direction: column;
+    justify-content:center;
+    align-items:center;
+}
+
+/* Form */
+.form-container {
+    background: rgba(0,0,0,0.2);
+    padding:40px;
+    border-radius:15px;
+}
+
+input {
+    padding:10px;
+    margin:10px;
+    width:250px;
+}
+
+/* Images */
+#surpriseImageContainer {
+    display:none;
+    gap:20px;
+}
+
+#surpriseImageContainer img {
+    width:220px;
+    height:350px;
+    opacity:0;
+}
+
+.left { transform:translateX(-200px); }
+.right { transform:translateX(200px); }
+.center { transform:scale(0.5); }
+
+@keyframes slideLeft {
+    to { opacity:1; transform:translateX(0); }
+}
+@keyframes slideRight {
+    to { opacity:1; transform:translateX(0); }
+}
+@keyframes popCenter {
+    to { opacity:1; transform:scale(1); }
+}
+
+/* Shake */
+@keyframes shake {
+    0%,100%{transform:translateX(0);}
+    25%{transform:translateX(-10px);}
+    75%{transform:translateX(10px);}
+}
+.shake { animation:shake 0.5s; }
+
+</style>
+</head>
+
+<body>
+
+<div class="form-container" id="formContainer">
+<form id="birthdayForm">
+<input id="name" placeholder="Name" required><br>
+<input id="nickname" placeholder="Nickname" required><br>
+<button>Start</button>
+</form>
+</div>
+
+<div id="surpriseImageContainer">
+<img class="left">
+<img class="right">
+<img class="left">
+<img class="right">
+<img class="center">
+</div>
+
+<button id="goBackBtn" style="display:none;">Go Back</button>
+
+<audio id="teddySong"><source src="teddy.mp3.mp3"></audio>
+<audio id="rabbitSong"><source src="rabbit.mp3"></audio>
+
+<script>
+
+const form = document.getElementById('birthdayForm');
+const formContainer = document.getElementById('formContainer');
+const surpriseImage = document.getElementById('surpriseImageContainer');
+const goBackBtn = document.getElementById('goBackBtn');
+
+const teddyAudio = document.getElementById('teddySong');
+const rabbitAudio = document.getElementById('rabbitSong');
+
+const teddyTimes = [9,12,15,18,21];
+const rabbitTimes = [11,16,21,26,31];
+
+const rabbitImages = [
+"group-5.png",
+"group-3.png",
+"group-4.png",
+"group-1.png",
+"group-2.png"
+];
+
+const imgs = document.querySelectorAll('#surpriseImageContainer img');
+
+form.addEventListener("submit", function(e){
+    e.preventDefault();
+
+    let name = name.value.toLowerCase();
+    let nick = nickname.value.toLowerCase();
+
+    if(name !== "rohitha"){
+        formContainer.classList.add("shake");
+        setTimeout(()=>formContainer.classList.remove("shake"),500);
+        return;
+    }
+
+    formContainer.style.display="none";
+    surpriseImage.style.display="flex";
+
+    if(nick === "teddy"){
+        playTeddy();
+    } else if(nick === "rabbit"){
+        playRabbit();
+    }
+});
+
+function playTeddy(){
+    teddyAudio.currentTime = 8.5;
+
+    teddyAudio.onplaying = ()=>{
+        syncImages(teddyAudio, teddyTimes);
+    };
+
+    teddyAudio.play();
+}
+
+function playRabbit(){
+
+    imgs.forEach((img,i)=>{
+        img.src = rabbitImages[i];
+        img.style.opacity="0";
+    });
+
+    rabbitAudio.currentTime = 8;
+
+    rabbitAudio.onplaying = ()=>{
+        syncImages(rabbitAudio, rabbitTimes, true);
+    };
+
+    rabbitAudio.play();
+}
+
+function syncImages(audio, timings, isRabbit=false){
+
+    let shown = new Array(imgs.length).fill(false);
+
+    audio.ontimeupdate = ()=>{
+
+        let t = audio.currentTime;
+
+        if(isRabbit && t>=36){
+            audio.pause();
+        }
+
+        if(t>=30){
+            goBackBtn.style.display="block";
+        }
+
+        imgs.forEach((img,i)=>{
+            if(!shown[i] && t>=timings[i]){
+                shown[i]=true;
+
+                img.style.opacity="1";
+                img.style.animation="none";
+                img.offsetHeight;
+
+                if(img.classList.contains("left")){
+                    img.style.animation="slideLeft 0.8s forwards";
+                } else if(img.classList.contains("right")){
+                    img.style.animation="slideRight 0.8s forwards";
+                } else {
+                    img.style.animation="popCenter 0.8s forwards";
+                }
+            }
+        });
+    };
+}
+
+goBackBtn.onclick = ()=>{
+    teddyAudio.pause();
+    rabbitAudio.pause();
+
+    imgs.forEach(img=>{
+        img.style.opacity="0";
+        img.style.animation="none";
+    });
+
+    surpriseImage.style.display="none";
+    formContainer.style.display="block";
+    goBackBtn.style.display="none";
+};
+
+</script>
+
+</body>
+</html>

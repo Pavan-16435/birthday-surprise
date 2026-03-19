@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday - BMW Challenge</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            background-image: url("https://d23.com/app/uploads/2006/06/1180w-600h_TDID-cars.jpg");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-attachment: fixed;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Arial Black', sans-serif;
+            position: relative;
+        }
+
+        /* BMW Logo Container */
+        .bmw-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            z-index: 10;
+            cursor: pointer;
+            animation: floatIn 0.8s ease-out;
+            margin-top: -80px;
+        }
+
+        @keyframes floatIn {
+            from {
+                opacity: 0;
+                transform: scale(0.5) translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        /* BMW Logo SVG Style */
+        .bmw-logo {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.4));
+            transition: transform 0.3s ease;
+        }
+
+        .bmw-container:active .bmw-logo {
+            transform: scale(0.95);
+        }
+
+        /* Counter Display */
+        .counter-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.8);
+            z-index: 20;
+            display: none;
+            width: 120px;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .counter-display.active {
+            display: flex;
+        }
+
+        .bmw-logo.hidden {
+            display: none;
+        }
+        
+
+        /* Instruction Text */
+        .instruction {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 16px;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            z-index: 5;
+            animation: blink 1.5s ease-in-out infinite;
+        }
+
+
+
+        @keyframes blink {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+
+        /* Transition Overlay */
+        #transitionOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 9999;
+            transition: opacity 1s ease;
+        }
+
+        /* Zoom + Blur effect */
+        body.transitioning {
+            transform: scale(1.1);
+            filter: blur(8px);
+            transition: all 1s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="bmw-container" id="bmwContainer">
+        <svg class="bmw-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <!-- BMW Circle Border -->
+            <circle cx="50" cy="50" r="48" fill="none" stroke="white" stroke-width="2"/>
+            
+            <!-- BMW 4 Quadrant Design -->
+            <!-- Top-Left: Blue -->
+            <path d="M 50 50 L 50 2 A 48 48 0 0 0 2 50 Z" fill="#0066cc"/>
+            
+            <!-- Top-Right: white -->
+            <path d="M 50 50 L 98 50 A 48 48 0 0 0 50 2 Z" fill="white"/>
+            
+            <!-- Bottom-Left: White -->
+            <path d="M 50 50 L 2 50 A 48 48 0 0 0 50 98 Z" fill="white"/>
+            
+            <!-- Bottom-Right: Light Blue -->
+            <path d="M 50 50 L 50 98 A 48 48 0 0 0 98 50 Z" fill="#0099ff"/>
+            
+            <!-- Inner Circle Outline -->
+            <circle cx="50" cy="50" r="40" fill="none" stroke="white" stroke-width="1.5" opacity="0.6"/>
+        </svg>
+        
+        <div class="counter-display" id="counterDisplay">0</div>
+    </div>
+
+    <div class="instruction" id="instruction">
+        click the BMW logo to start the engine sound and watch the counter go up to 44!
+    </div>
+
+    <!-- BMW Start Sound -->
+    <audio id="bmwStartSound" style="display: none;">
+        <source src="bmw_logo_start.mp3" type="audio/mpeg">
+    </audio>
+
+        <!-- Transition Overlay -->
+    <div id="transitionOverlay"></div>
+
+    <script>
+        const bmwContainer = document.getElementById('bmwContainer');
+        const bmwLogo = document.querySelector('.bmw-logo');
+        const counterDisplay = document.getElementById('counterDisplay');
+        const instruction = document.getElementById('instruction');
+        const bmwStartSound = document.getElementById('bmwStartSound');
+        
+        let isPlaying = false;
+        let counter = 0;
+        let counterInterval = null;
+        let startTime = 0;
+        const COUNTER_MAX = 44;
+        const UPDATE_INTERVAL = 10; // Update counter every 10 milliseconds
+
+        // Click event listener
+        bmwContainer.addEventListener('click', startCounter);
+        
+        // Continuously update counter based on elapsed time
+        let updateInterval = null;
+        
+      function updateCounterLoop() {
+
+    if (isPlaying && bmwStartSound.duration > 0) {
+
+        const elapsedTime = Date.now() - startTime;
+
+        // 🔥 get real audio duration (in ms)
+        const duration = bmwStartSound.duration * 1000;
+
+        // 🔥 perfectly sync counter with audio
+        const newCounter = Math.floor(
+            Math.min((elapsedTime / duration) * COUNTER_MAX, COUNTER_MAX)
+        );
+
+        if (newCounter !== counter) {
+            counter = newCounter;
+            counterDisplay.textContent = counter;
+        }
+
+        if (elapsedTime < duration) {
+            updateInterval = requestAnimationFrame(updateCounterLoop);
+        }
+    }
+}
+        
+        // When audio ends, ensure counter reaches 44
+        bmwStartSound.addEventListener('ended', function() {
+            if (isPlaying) {
+                counter = COUNTER_MAX;
+                counterDisplay.textContent = counter;
+                if (updateInterval) cancelAnimationFrame(updateInterval);
+                stopCounter();
+                navigate();
+            }
+        });
+
+        function startCounter(e) {
+            e.preventDefault();
+            if (isPlaying) return;
+            
+            isPlaying = true;
+            counter = 0;
+            startTime = Date.now();
+            counterDisplay.classList.add('active');
+            counterDisplay.textContent = counter;
+            bmwLogo.classList.add('hidden');
+            instruction.style.display = 'none';
+
+            // Play BMW start sound
+            bmwStartSound.currentTime = 0;
+            bmwStartSound.play().catch(err => {
+                console.error('BMW sound play error:', err);
+            });
+            
+            // Start counter update loop
+            updateCounterLoop();
+        }
+
+        function stopCounter() {
+            if (!isPlaying) return;
+            
+            isPlaying = false;
+            
+            // Cancel update loop
+            if (updateInterval) {
+                cancelAnimationFrame(updateInterval);
+                updateInterval = null;
+            }
+            
+            // Stop the BMW sound
+            bmwStartSound.pause();
+            bmwStartSound.currentTime = 0;
+
+            counterDisplay.classList.remove('active');
+            bmwLogo.classList.remove('hidden');
+            instruction.style.display = 'block';
+        }
+
+        function navigate() {
+
+            const overlay = document.getElementById("transitionOverlay");
+
+            // Step 1: Add zoom + blur
+            document.body.classList.add("transitioning");
+
+            // Step 2: Fade to black
+            setTimeout(() => {
+                overlay.style.opacity = "1";
+            }, 300);
+
+            // Step 3: Navigate after animation
+            setTimeout(() => {
+                window.location.href = 'hi.html';
+            }, 1200);
+        }
+    </script>
+</body>
+</html>
