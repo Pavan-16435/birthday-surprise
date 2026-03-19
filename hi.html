@@ -624,9 +624,18 @@ function showFinalScreen(){
     },100);
 
     // 🎶 PLAY FINAL SONG
-    finalAudio.play().catch(err => {
-        console.error("Final audio error:", err);
-    });
+   finalAudio.play().then(() => {
+
+    finalAudio.ontimeupdate = function () {
+        if (finalAudio.currentTime >= 29) {
+            finalAudio.pause();
+            finalAudio.ontimeupdate = null; // stop checking
+        }
+    };
+
+}).catch(err => {
+    console.error("Final audio error:", err);
+});
 }
 
 </script>
